@@ -3,9 +3,10 @@
 **Team Name:** AIChefs
 
 **Team Members:**
-- Maloș Alexandru
 - Laza Bogdan
 - Labo Nikole
+- Maloș Alexandru
+
 
 ## Description
 
