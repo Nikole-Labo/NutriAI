@@ -1,23 +1,50 @@
-# NutriAI
+# NutriAI: Nutrition Assistant
 
-A RAG-based assistant that helps users eat healthier and cook meals with the
-ingredients they already have at home.
+**Team name:** AIChefs  
 
-**Team:** Malos Alexandru, Laza Bogdan, Labo Nikole
+**Team members:**
+
+- Laza Bogdan  
+- Labo Nikole  
+- Maloș Alexandru  
+
+NutriAI is an intelligent culinary assistant designed to seamlessly integrate recipe discovery, macronutrient tracking, and personalized meal planning into a single conversation. It moves beyond reactive tracking to proactively suggest macro-friendly meals based on a user's real-time ingredient inventory, previous consumption, and dynamic preferences (e.g., using perishable items, specific cravings).
+
+### Goals
+
+- Craft personalized recipes aligned with daily calorie and macronutrient targets based on biometric data (gender, height, weight, age) and fitness goals.
+- Build persistent user profiles through a continuous feedback loop (rating recipes and ingredients) to refine flavor preferences and dietary restrictions.
+- Address limitations of existing solutions (traditional recipe discovery, reactive tracking, rigid automated planning) by offering a seamless, conversation-driven integration that adapts in real-time.
 
 ---
 
-## Architecture (high level)
+## Architecture overview
 
-| Stage          | Choice                                                                 |
-| -------------- | ---------------------------------------------------------------------- |
-| Datasets       | Recipe1M+ (recipes) + USDA FoodData Central (nutrition)                |
-| Chunking       | Markdown-Header structural + Parent-Child + Recursive fallback         |
-| Vector DB      | Qdrant (hybrid dense + sparse, nested payload filtering)               |
-| Retrieval      | Hybrid (BM25 sparse + dense embeddings) + Cross-Encoder reranker       |
-| Generator LLM  | SmolLM-1.7B-Instruct                                                   |
+Higher-level diagrams and narrative live in **`Architecture.md`**.
 
-This repo currently implements **Stage 1: Data Chunking**.
+The system uses an agentic culinary assistant architecture built on:
+
+- **Custom RAG pipeline:** Recipe data, nutritional metadata (USDA FoodData Central), and (later) user inventory in a vector database for retrieval and recipe adaptation.
+- **Model:** fine-tuned **SmolLM-1.7B (Instruct)** as the reasoning agent, with a **ReAct** loop for orchestration.
+
+#### Detailed technical choices
+
+- **Chunking:** Markdown-header structural chunking (Ingredients / Instructions); **parent–child** indexing (ingredients and nutrient lines as children linked to full-recipe parents); **recursive token-limited splitting** as a fallback for long parents (see codebase under `src/nutriai/chunking/`).
+- **Vector database:** **Qdrant** — hybrid search, payloads (e.g. `parent_id` on children), nested filtering where needed.
+- **RAG:** hybrid **dense + sparse (BM25)** retrieval; **cross-encoder reranking** for macro-fit-style scoring.
+
+| Stage           | Choice |
+| ---------------- | ------ |
+| Datasets (data) | Recipe sources + USDA FoodData Central; prototyping uses RecipeNLG / Epicurious loaders |
+| Chunking       | Implemented in this repo (**Stage 1**) |
+| Vector DB       | Qdrant (planned **Stage 2**) |
+| Generator       | SmolLM-1.7B-Instruct (later stages) |
+
+---
+
+## Current status
+
+This repository implements **Stage 1: data chunking** — normalized recipes → Markdown parents + ingredient/nutrient child chunks (`parents.jsonl` / `children.jsonl`). Embeddings, Qdrant, retrieval API, and the chat UI are **not** wired up here yet.
 
 ---
 
@@ -25,17 +52,18 @@ This repo currently implements **Stage 1: Data Chunking**.
 
 ```
 NutriAI/
+├── Architecture.md      # Architecture write-up from the team repo
 ├── data/
-│   ├── raw/            # Raw Recipe1M+ / RecipeNLG / USDA dumps (gitignored)
-│   ├── interim/        # Recipes converted to Markdown (gitignored)
-│   └── processed/      # Final parent + child chunks (JSONL, gitignored)
+│   ├── raw/             # Raw dumps (gitignored)
+│   ├── interim/        # Intermediate artifacts (gitignored)
+│   └── processed/       # Chunk output JSONL (gitignored)
 ├── src/nutriai/
 │   ├── config.py
-│   ├── schemas.py      # Pydantic models: Recipe, ParentChunk, ChildChunk
-│   ├── data/           # Sample data + Recipe1M+ / RecipeNLG loaders
-│   └── chunking/       # Markdown converter + Parent-Child + Recursive fallback
+│   ├── schemas.py
+│   ├── data/            # Loaders (sample, Recipe1M+, HF, Epicurious, …)
+│   └── chunking/
 ├── scripts/
-│   └── run_chunking.py # CLI entry point
+│   └── run_chunking.py
 └── tests/
 ```
 
@@ -44,14 +72,9 @@ NutriAI/
 ## Setup
 
 ```powershell
-# 1. Create and activate a virtual environment
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-
-# 2. Install dependencies
 pip install -r requirements.txt
-
-# 3. Copy env template and fill in keys (only needed for USDA / HuggingFace)
 copy .env.example .env
 ```
 
@@ -59,47 +82,38 @@ copy .env.example .env
 
 ## Stage 1 — Run the chunking pipeline
 
-The pipeline is dataset-agnostic. Out of the box it ships with a small
-hand-crafted sample so you can run it without downloading anything.
-
 ```powershell
-# Run on the built-in sample (5 recipes)
+# Built-in sample (no downloads)
 python scripts/run_chunking.py --source sample --out data/processed
 
-# Run on a HuggingFace recipe dataset (e.g. RecipeNLG mirror)
+# HuggingFace RecipeNLG mirror
 python scripts/run_chunking.py --source hf --hf-name mbien/recipe_nlg --limit 1000 --out data/processed
 
-# Run on a local Recipe1M+ JSON file (after you obtain access)
+# Recipe1M+ layer1.json (after you obtain access)
 python scripts/run_chunking.py --source recipe1m --path data/raw/layer1.json --limit 1000 --out data/processed
+
+# Epicurious (full_format_recipes.json in recipe_dataset/, not committed — download separately)
+python scripts/run_chunking.py --source epicurious --path recipe_dataset --out data/processed
 ```
 
 Output:
 
-- `data/processed/parents.jsonl` — one full recipe per line (the **parent** docs)
-- `data/processed/children.jsonl` — per-ingredient and per-nutrient atomic chunks,
-  each carrying `parent_id` so retrieval can hop child → parent
+- `data/processed/parents.jsonl` — parent recipe chunks  
+- `data/processed/children.jsonl` — child chunks with `parent_id`
 
 ---
 
-## Datasets — how to obtain them
+## Datasets
 
-### Recipe1M+
-Recipe1M+ is hosted by MIT CSAIL and requires registration:
-http://pic2recipe.csail.mit.edu/ . After approval, download `layer1.json`
-(recipes + ingredients + instructions) into `data/raw/`.
-
-### RecipeNLG (recommended for prototyping)
-Drop-in alternative available on HuggingFace without registration:
-https://huggingface.co/datasets/mbien/recipe_nlg
-
-### USDA FoodData Central (nutrition metadata)
-Free API key (instant): https://fdc.nal.usda.gov/api-key-signup.html
-Put the key in `.env` as `USDA_FDC_API_KEY=...`.
+- **Recipe1M+:** http://pic2recipe.csail.mit.edu/ — place `layer1.json` under `data/raw/` if you use that loader.  
+- **RecipeNLG:** https://huggingface.co/datasets/mbien/recipe_nlg  
+- **Epicurious (bundle used for Stage 1):** place extracted `full_format_recipes.json` in `recipe_dataset/` (folder is `.gitignore`d).  
+- **USDA FDC:** https://fdc.nal.usda.gov/api-key-signup.html → set `USDA_FDC_API_KEY` in `.env` for future enrichment steps.
 
 ---
 
-## Next stages (not in this repo yet)
+## Next stages (roadmap)
 
-2. **Embeddings & Indexing** — encode chunks (dense + sparse) and load into Qdrant.
-3. **Retrieval** — hybrid search + cross-encoder reranker scoring on macro-fit.
-4. **Generation** — SmolLM-1.7B-Instruct trims retrieved recipe to the user's macros.
+1. **Embeddings & indexing** — dense + sparse encoders → Qdrant.  
+2. **Retrieval** — hybrid query + reranking.  
+3. **Generation** — SmolLM orchestration over retrieved parents.
