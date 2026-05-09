@@ -1,0 +1,25 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+.env
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+.idea/
+.vscode/
+data/raw/*
+data/interim/*
+data/processed/*
+# Local Kaggle / Epicurious extract (large; not for git)
+recipe_dataset/
+!data/raw/.gitkeep
+!data/interim/.gitkeep
+!data/processed/.gitkeep
+qdrant_storage/
+.pip_check/
+*.log
