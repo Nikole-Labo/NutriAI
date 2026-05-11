@@ -45,3 +45,21 @@ MARKDOWN_HEADERS_TO_SPLIT_ON: list[tuple[str, str]] = [
     ("#", "title"),
     ("##", "section"),
 ]
+
+# --- Qdrant / hybrid embeddings (dense + sparse BM25) ----------------------
+EMBEDDING_MODEL_NAME: str = "sentence-transformers/all-MiniLM-L6-v2"
+EMBEDDING_VECTOR_SIZE: int = 384
+SPARSE_EMBEDDING_MODEL_NAME: str = "Qdrant/bm25"
+QDRANT_COLLECTION_NAME: str = "recipe_chunks"
+QDRANT_VECTOR_NAME: str = "dense"
+QDRANT_SPARSE_VECTOR_NAME: str = "sparse"
+# Candidate pool per branch before RRF fusion (retrieval).
+HYBRID_PREFETCH_LIMIT: int = 48
+
+# --- Cross-encoder rerank + macro fit ------------------------------------
+RERANK_CROSS_ENCODER_MODEL: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"
+RERANK_PASSAGE_MAX_CHARS: int = 1400
+# Macro term dominates so recipes near remaining kcal / macro targets rank first;
+# cross-encoder breaks ties using the natural-language query + recipe text.
+RERANK_MACRO_WEIGHT: float = 0.72
+RERANK_CE_WEIGHT: float = 0.28
