@@ -7,7 +7,7 @@ from functools import lru_cache
 from fastembed import SparseTextEmbedding
 from qdrant_client.models import SparseVector
 
-from src.nutriai.config import SPARSE_EMBEDDING_MODEL_NAME
+from nutriai.config import SPARSE_EMBEDDING_MODEL_NAME
 
 
 @lru_cache(maxsize=1)

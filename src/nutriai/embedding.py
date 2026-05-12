@@ -6,7 +6,7 @@ from functools import lru_cache
 
 from sentence_transformers import SentenceTransformer
 
-from src.nutriai.config import EMBEDDING_MODEL_NAME
+from nutriai.config import EMBEDDING_MODEL_NAME
 
 
 @lru_cache(maxsize=1)

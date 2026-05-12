@@ -1,10 +1,21 @@
 import re
+import sys
+from pathlib import Path
+
+# Ensure ``nutriai`` is importable when this file is run directly.
+_SRC_ROOT = Path(__file__).resolve().parents[2]
+if str(_SRC_ROOT) not in sys.path:
+    sys.path.insert(0, str(_SRC_ROOT))
+
+_PROJECT_ROOT = _SRC_ROOT.parent
+
 import torch
+from difflib import get_close_matches
+from dotenv import load_dotenv
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 
-from src.nutriai.reranking import MacroTargets, search_ingredients_with_macro_rerank
-from src.nutriai.retrieval import CulinaryTools
-from difflib import get_close_matches
+from nutriai.reranking import MacroTargets, rerank_parents, search_ingredients_with_macro_rerank
+from nutriai.retrieval import CulinaryTools
 
 
 MASTER_INGREDIENTS = {
@@ -45,10 +56,10 @@ class NutriAgent:
             tokenizer=self.tokenizer
         )
 
-        URL = "https://a75b8deb-f8d8-4e71-92de-038169e741b9.eu-central-1-0.aws.cloud.qdrant.io"
-        KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIiwic3ViamVjdCI6ImFwaS1rZXk6M2VkMDY3OTktYzkyYS00MDA1LThlN2EtNDE2YTFhZTU2NzZjIn0.L-dJM96g0DUTyF1WwnTaHKzxqPE4eJCG4vc3NbF1OOQ"
-
-        self.tools = CulinaryTools(url=URL, api_key=KEY)
+        # Project root (NutriAI/) for ``.env``
+        load_dotenv(_PROJECT_ROOT / ".env")
+        # Uses QDRANT_URL + QDRANT_API_KEY from .env (same as indexing / smoke scripts).
+        self.tools = CulinaryTools()
 
     def parse_action(self, llm_output: str):
         """Regex to find: Action: search_by_ingredients(['eggs', 'flour'])"""
@@ -105,9 +116,7 @@ class NutriAgent:
 
         print(f"--- Sanitized Search: {ingredients} ---")
 
-        from src.nutriai.reranking import search_ingredients_with_macro_rerank, rerank_parents
-
-        # 1. This call uses your self.tools (Cloud Qdrant)
+        # 1. Retrieve + rerank against Qdrant (Cloud URL from .env)
         _, pids = search_ingredients_with_macro_rerank(
             self.tools,
             ingredients=ingredients,
@@ -129,7 +138,6 @@ class NutriAgent:
         # 3. USE THE BEST MATCH DIRECTLY
         # Avoid the 'if matched' check which is too restrictive for real-world data
         best_match = results[0]
-        recipe_text = self.tools.get_full_recipe(best_match.parent_id)
         recipe_text = self.tools.get_full_recipe(best_match.parent_id)
         print(f"--- Final pick: '{best_match.title_hint}' ---")
 

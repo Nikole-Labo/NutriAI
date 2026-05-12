@@ -6,7 +6,7 @@ exercise the parent/child splitter end-to-end.
 
 from __future__ import annotations
 
-from src.nutriai.schemas import Nutrient, Recipe
+from nutriai.schemas import Nutrient, Recipe
 
 SAMPLE_RECIPES: list[Recipe] = [
     Recipe(

@@ -1,6 +1,6 @@
 """Dataset loaders. All loaders return ``list[Recipe]``."""
 
-from src.nutriai.data.loaders import (
+from nutriai.data.loaders import (
     load_epicurious,
     load_huggingface_recipes,
     load_recipe1m,

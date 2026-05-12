@@ -1,5 +1,5 @@
 """Compatibility shim — use ``nutriai.retrieval.CulinaryTools``."""
 
-from src.nutriai.retrieval import CulinaryTools
+from nutriai.retrieval import CulinaryTools
 
 __all__ = ["CulinaryTools"]

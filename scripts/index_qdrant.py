@@ -45,17 +45,17 @@ sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 load_dotenv(PROJECT_ROOT / ".env")
 
-from src.nutriai.config import (  # noqa: E402
+from nutriai.config import (  # noqa: E402
     EMBEDDING_VECTOR_SIZE,
     PROCESSED_DIR,
     QDRANT_COLLECTION_NAME,
     QDRANT_SPARSE_VECTOR_NAME,
     QDRANT_VECTOR_NAME,
 )
-from src.nutriai.embedding import encode_texts, get_embedding_model  # noqa: E402
-from src.nutriai.qdrant_ids import child_point_uuid, parent_point_uuid  # noqa: E402
-from src.nutriai.qdrant_indexes import ensure_filter_payload_indexes  # noqa: E402
-from src.nutriai.sparse_embedding import texts_to_sparse_vectors  # noqa: E402
+from nutriai.embedding import encode_texts, get_embedding_model  # noqa: E402
+from nutriai.qdrant_ids import child_point_uuid, parent_point_uuid  # noqa: E402
+from nutriai.qdrant_indexes import ensure_filter_payload_indexes  # noqa: E402
+from nutriai.sparse_embedding import texts_to_sparse_vectors  # noqa: E402
 
 
 def _client() -> QdrantClient:

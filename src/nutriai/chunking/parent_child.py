@@ -36,14 +36,14 @@ from typing import Iterable
 
 from langchain_text_splitters import MarkdownHeaderTextSplitter
 
-from src.nutriai.chunking.markdown_converter import recipe_to_markdown
-from src.nutriai.chunking.recursive_fallback import count_tokens, enforce_token_limit
-from src.nutriai.config import (
+from nutriai.chunking.markdown_converter import recipe_to_markdown
+from nutriai.chunking.recursive_fallback import count_tokens, enforce_token_limit
+from nutriai.config import (
     CHILD_MAX_TOKENS,
     MARKDOWN_HEADERS_TO_SPLIT_ON,
     PARENT_MAX_TOKENS,
 )
-from src.nutriai.schemas import ChildChunk, ParentChunk, Recipe
+from nutriai.schemas import ChildChunk, ParentChunk, Recipe
 
 
 _MARKDOWN_SPLITTER = MarkdownHeaderTextSplitter(

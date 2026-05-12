@@ -25,7 +25,7 @@ Layout::
 
 from __future__ import annotations
 
-from src.nutriai.schemas import Recipe
+from nutriai.schemas import Recipe
 
 
 def recipe_to_markdown(recipe: Recipe) -> str:

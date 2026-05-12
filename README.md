@@ -107,6 +107,36 @@ python scripts/run_chunking.py --source recipe1m --path data/raw/layer1.json --l
 python scripts/run_chunking.py --source epicurious --path recipe_dataset --out data/processed
 ```
 
+### Full corpus (not the 5-recipe sample)
+
+Omit **`--limit`** so the loader ingests **everything** it can read (HF uses **streaming**, so memory stays bounded; Epicurious / Recipe1M+ load the **whole JSON into RAM** — use a machine with enough memory).
+
+Pick **one** source you actually have:
+
+**HuggingFace RecipeNLG — entire split (recommended for “full” without a local giant JSON):**
+
+```powershell
+python scripts/run_chunking.py --source hf --hf-name mbien/recipe_nlg --hf-split train --out data/processed
+```
+
+**Epicurious** — requires `full_format_recipes.json` (file or folder per `--path`). Default folder is `recipe_dataset/` under the repo root:
+
+```powershell
+python scripts/run_chunking.py --source epicurious --path recipe_dataset --out data/processed
+```
+
+**Recipe1M+** — requires `data/raw/layer1.json` (or pass another path):
+
+```powershell
+python scripts/run_chunking.py --source recipe1m --path data/raw/layer1.json --out data/processed
+```
+
+After any full re-chunk, **re-upload vectors** so Qdrant matches the new JSONL:
+
+```powershell
+python scripts/index_qdrant.py --recreate
+```
+
 Output:
 
 - `data/processed/parents.jsonl` — parent recipe chunks  
@@ -134,11 +164,13 @@ Hybrid queries combine both branches with **RRF** (reciprocal rank fusion). Payl
    - `parents.jsonl`  
    - `children.jsonl`  
 
-   Example if you still need to generate them:
+   Example (tiny sample for smoke tests):
 
    ```powershell
    python scripts/run_chunking.py --source sample --out data/processed
    ```
+
+   For a **full dataset**, complete **Stage 1** using the [Full corpus](#full-corpus-not-the-5-recipe-sample) subsection above, then continue with Step 4 here.
 
 2. **Environment ready** — [Setup](#setup): virtualenv created, `pip install -r requirements.txt` done. First runs download model weights (MiniLM, FastEmbed; cross-encoder when you rerank).
 
