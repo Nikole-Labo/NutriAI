@@ -16,7 +16,7 @@ from qdrant_client.models import (
     Prefetch,
 )
 
-from nutriai.config import (
+from src.nutriai.config import (
     EMBEDDING_MODEL_NAME,
     EMBEDDING_VECTOR_SIZE,
     HYBRID_PREFETCH_LIMIT,
@@ -25,9 +25,9 @@ from nutriai.config import (
     QDRANT_VECTOR_NAME,
     SPARSE_EMBEDDING_MODEL_NAME,
 )
-from nutriai.embedding import encode_texts, get_embedding_model
-from nutriai.qdrant_indexes import ensure_filter_payload_indexes
-from nutriai.sparse_embedding import texts_to_sparse_vectors
+from src.nutriai.embedding import encode_texts, get_embedding_model
+from src.nutriai.qdrant_indexes import ensure_filter_payload_indexes
+from src.nutriai.sparse_embedding import texts_to_sparse_vectors
 
 
 def _client_from_env(

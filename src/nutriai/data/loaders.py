@@ -11,8 +11,8 @@ import json
 from pathlib import Path
 from typing import Iterator, Optional
 
-from nutriai.data.sample import SAMPLE_RECIPES
-from nutriai.schemas import Nutrient, Recipe
+from src.nutriai.data.sample import SAMPLE_RECIPES
+from src.nutriai.schemas import Nutrient, Recipe
 
 
 def load_sample() -> list[Recipe]:

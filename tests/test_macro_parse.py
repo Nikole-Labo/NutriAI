@@ -1,8 +1,8 @@
 """Unit tests for nutrition parsing from Markdown parents."""
 
-from nutriai.chunking.markdown_converter import recipe_to_markdown
-from nutriai.data.sample import SAMPLE_RECIPES
-from nutriai.macro_parse import parse_nutrients_from_markdown
+from src.nutriai.chunking.markdown_converter import recipe_to_markdown
+from src.nutriai.data.sample import SAMPLE_RECIPES
+from src.nutriai.macro_parse import parse_nutrients_from_markdown
 
 
 def test_parse_shepherds_pie_nutrients():

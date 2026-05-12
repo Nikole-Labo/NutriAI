@@ -16,9 +16,9 @@ The flow is:
     ChildChunk(s)          <-- indexed in Qdrant, link to parent_id
 """
 
-from nutriai.chunking.markdown_converter import recipe_to_markdown
-from nutriai.chunking.parent_child import build_chunks, split_recipes
-from nutriai.chunking.recursive_fallback import enforce_token_limit
+from src.nutriai.chunking.markdown_converter import recipe_to_markdown
+from src.nutriai.chunking.parent_child import build_chunks, split_recipes
+from src.nutriai.chunking.recursive_fallback import enforce_token_limit
 
 __all__ = [
     "recipe_to_markdown",

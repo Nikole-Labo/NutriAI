@@ -1,9 +1,9 @@
 import os
-from nutriai.retrieval import CulinaryTools
-from nutriai.reranking import (
+from src.nutriai.reranking import (
     search_ingredients_with_macro_rerank,
     MacroTargets
 )
+from src.nutriai.retrieval import CulinaryTools
 
 # Use the credentials you have
 URL = "https://a75b8deb-f8d8-4e71-92de-038169e741b9.eu-central-1-0.aws.cloud.qdrant.io"

@@ -30,9 +30,9 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
-from nutriai.chunking import split_recipes  # noqa: E402
-from nutriai.config import PROCESSED_DIR  # noqa: E402
-from nutriai.data import (  # noqa: E402
+from src.nutriai.chunking import split_recipes  # noqa: E402
+from src.nutriai.config import PROCESSED_DIR  # noqa: E402
+from src.nutriai.data import (  # noqa: E402
     load_epicurious,
     load_huggingface_recipes,
     load_recipe1m,

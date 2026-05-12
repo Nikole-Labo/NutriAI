@@ -9,14 +9,14 @@ import numpy as np
 from pydantic import BaseModel, Field
 from sentence_transformers import CrossEncoder
 
-from nutriai.config import (
+from src.nutriai.config import (
     RERANK_CE_WEIGHT,
     RERANK_CROSS_ENCODER_MODEL,
     RERANK_MACRO_WEIGHT,
     RERANK_PASSAGE_MAX_CHARS,
 )
-from nutriai.macro_parse import parse_nutrients_from_markdown
-from nutriai.retrieval import CulinaryTools
+from src.nutriai.macro_parse import parse_nutrients_from_markdown
+from src.nutriai.retrieval import CulinaryTools
 
 
 class MacroTargets(BaseModel):

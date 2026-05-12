@@ -6,7 +6,7 @@ from qdrant_client import QdrantClient
 from qdrant_client.http.exceptions import UnexpectedResponse
 from qdrant_client.models import PayloadSchemaType
 
-from nutriai.config import QDRANT_COLLECTION_NAME
+from src.nutriai.config import QDRANT_COLLECTION_NAME
 
 
 def ensure_filter_payload_indexes(

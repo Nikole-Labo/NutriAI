@@ -11,9 +11,9 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
-from nutriai.chunking import build_chunks, recipe_to_markdown, split_recipes
-from nutriai.data import load_sample
-from nutriai.schemas import ChildChunk, ParentChunk
+from src.nutriai.chunking import build_chunks, recipe_to_markdown, split_recipes
+from src.nutriai.data import load_sample
+from src.nutriai.schemas import ChildChunk, ParentChunk
 
 
 def test_markdown_has_required_headers() -> None:

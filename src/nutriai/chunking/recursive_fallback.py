@@ -24,7 +24,7 @@ from __future__ import annotations
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-from nutriai.config import (
+from src.nutriai.config import (
     PARENT_CHUNK_OVERLAP,
     PARENT_MAX_TOKENS,
     TOKENIZER_ENCODING,
